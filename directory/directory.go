@@ -1,27 +1,27 @@
-package directory
+package dir
 
 import (
 	"regexp"
 	"sync"
 
-	"github.com/dustywilson/directory"
+	"github.com/dustywilson/dir"
 	"github.com/satori/go.uuid"
 )
 
-// Directory is an implementation of directory.Directory
+// Directory is an implementation of dir.Directory
 type Directory struct {
-	root     directory.Directory
+	root     dir.Directory
 	uuid     uuid.UUID
 	name     string
-	parent   directory.Directory
-	children []directory.Directory
-	files    []directory.File
-	owner    directory.User
+	parent   dir.Directory
+	children []dir.Directory
+	files    []dir.File
+	owner    dir.User
 	sync.RWMutex
 }
 
 // NewDirectory returns a new Directory
-func NewDirectory() directory.Directory {
+func NewDirectory() dir.Directory {
 	d := &Directory{
 		uuid: uuid.NewV4(),
 	}
@@ -51,7 +51,7 @@ func (d *Directory) Rename(name string) error {
 }
 
 // Parent returns the parent's Directory
-func (d *Directory) Parent() directory.Directory {
+func (d *Directory) Parent() dir.Directory {
 	d.RLock()
 	defer d.RUnlock()
 	return d.parent
@@ -65,15 +65,15 @@ func (d *Directory) IsRoot() bool {
 }
 
 // Root returns the root Directory
-func (d *Directory) Root() directory.Directory {
+func (d *Directory) Root() dir.Directory {
 	d.RLock()
 	defer d.RUnlock()
 	return d.root
 }
 
-// SetRoot sets/replaces the root directory.Directory for this Directory
-// This must only be called from method PlaceDirectory() on an implementation of directory.Directory.
-func (d *Directory) SetRoot(root directory.Directory) error {
+// SetRoot sets/replaces the root dir.Directory for this Directory
+// This must only be called from method PlaceDirectory() on an implementation of dir.Directory.
+func (d *Directory) SetRoot(root dir.Directory) error {
 	d.Lock()
 	defer d.Unlock()
 	d.root = root
@@ -81,14 +81,14 @@ func (d *Directory) SetRoot(root directory.Directory) error {
 }
 
 // Owner returns the owner's User
-func (d *Directory) Owner() directory.User {
+func (d *Directory) Owner() dir.User {
 	d.RLock()
 	defer d.RUnlock()
 	return d.owner
 }
 
 // SetOwner changes the Directory's owner
-func (d *Directory) SetOwner(owner directory.User) error {
+func (d *Directory) SetOwner(owner dir.User) error {
 	d.Lock()
 	defer d.Unlock()
 	d.owner = owner
@@ -101,19 +101,19 @@ func (d *Directory) Delete() error {
 	d.Lock()
 	defer d.Unlock()
 	if len(d.children) > 0 || len(d.files) > 0 {
-		return directory.ErrNotEmpty
+		return dir.ErrNotEmpty
 	}
 	if d.parent != nil {
 		d.parent.DetachDirectory(d)
 	} else {
-		return directory.ErrIsRoot
+		return dir.ErrIsRoot
 	}
 	return nil
 }
 
-// AttachDirectory adds a directory.Directory to this Directory
+// AttachDirectory adds a dir.Directory to this Directory
 // You likely would use the .Create() or .CreateDirectory() method instead, if available.
-func (d *Directory) AttachDirectory(dirIn directory.Directory) error {
+func (d *Directory) AttachDirectory(dirIn dir.Directory) error {
 	d.Lock()
 	defer d.Unlock()
 	dirIn.SetRoot(d.root)
@@ -122,10 +122,10 @@ func (d *Directory) AttachDirectory(dirIn directory.Directory) error {
 	return nil
 }
 
-// DetachDirectory removes a directory.Directory from this Directory
+// DetachDirectory removes a dir.Directory from this Directory
 // This is intended to be called from the target Direcotry's .Delete() method itself.
 // This does not test that the Directory is ready to be deleted, whatever that means (is empty, etc).
-func (d *Directory) DetachDirectory(dirIn directory.Directory) error {
+func (d *Directory) DetachDirectory(dirIn dir.Directory) error {
 	d.Lock()
 	defer d.Unlock()
 	matched := false
@@ -136,14 +136,14 @@ func (d *Directory) DetachDirectory(dirIn directory.Directory) error {
 		}
 	}
 	if !matched {
-		return directory.ErrNoMatch
+		return dir.ErrNoMatch
 	}
 	return nil
 }
 
-// AttachFile adds a directory.File to this Directory
+// AttachFile adds a dir.File to this Directory
 // If your File has a .Create() method, you might use that instead.
-func (d *Directory) AttachFile(f directory.File) error {
+func (d *Directory) AttachFile(f dir.File) error {
 	d.Lock()
 	defer d.Unlock()
 	// TODO: test for errors; ensure no duplicate attachment
@@ -151,10 +151,10 @@ func (d *Directory) AttachFile(f directory.File) error {
 	return nil
 }
 
-// DetachFile removes a directory.File from this Directory
+// DetachFile removes a dir.File from this Directory
 // This is intended to be called from the target File's .Delete() method itself.
 // This does not test that the File is ready to be deleted, whatever that means.
-func (d *Directory) DetachFile(f directory.File) error {
+func (d *Directory) DetachFile(f dir.File) error {
 	d.Lock()
 	defer d.Unlock()
 	matched := false
@@ -165,22 +165,22 @@ func (d *Directory) DetachFile(f directory.File) error {
 		}
 	}
 	if !matched {
-		return directory.ErrNoMatch
+		return dir.ErrNoMatch
 	}
 	return nil
 }
 
-// FindDirectories searches for one or more directory.Directory entries, recursively starting at this Directory
-func (d *Directory) FindDirectories(search *regexp.Regexp, recurseLevel int) ([]directory.Directory, error) {
+// FindDirectories searches for one or more dir.Directory entries, recursively starting at this Directory
+func (d *Directory) FindDirectories(search *regexp.Regexp, recurseLevel int) ([]dir.Directory, error) {
 	d.RLock()
 	defer d.RUnlock()
-	var directories []directory.Directory
+	var directories []dir.Directory
 	if search.MatchString(d.name) {
 		directories = append(directories, d)
 	}
-	for _, directory := range d.children {
+	for _, dir := range d.children {
 		if recurseLevel != 0 {
-			childMatches, err := directory.FindDirectories(search, recurseLevel-1)
+			childMatches, err := dir.FindDirectories(search, recurseLevel-1)
 			if err != nil {
 				// TODO: decide what to do here, if anything.
 			} else {
@@ -189,24 +189,24 @@ func (d *Directory) FindDirectories(search *regexp.Regexp, recurseLevel int) ([]
 		}
 	}
 	if len(directories) == 0 {
-		return nil, directory.ErrNoMatch
+		return nil, dir.ErrNoMatch
 	}
 	return directories, nil
 }
 
 // FindFiles searches for one or more File entries, recursively starting at the Directory
-func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]directory.File, error) {
+func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]dir.File, error) {
 	d.RLock()
 	defer d.RUnlock()
-	var files []directory.File
+	var files []dir.File
 	for _, file := range d.files {
 		if search.MatchString(file.Name()) {
 			files = append(files, file)
 		}
 	}
-	for _, directory := range d.children {
+	for _, dir := range d.children {
 		if recurseLevel != 0 {
-			childMatches, err := directory.FindFiles(search, recurseLevel-1)
+			childMatches, err := dir.FindFiles(search, recurseLevel-1)
 			if err != nil {
 				// TODO: decide what to do here, if anything.
 			} else {
@@ -215,13 +215,13 @@ func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]direct
 		}
 	}
 	if len(files) == 0 {
-		return nil, directory.ErrNoMatch
+		return nil, dir.ErrNoMatch
 	}
 	return nil, nil
 }
 
 // CreateDirectory creates a sub-Directory of the provided Directory
-func CreateDirectory(d directory.Directory, name string) (directory.Directory, error) {
+func CreateDirectory(d dir.Directory, name string) (dir.Directory, error) {
 	subdir := &Directory{
 		uuid: uuid.NewV4(),
 		name: name,
