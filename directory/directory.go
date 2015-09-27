@@ -1,4 +1,4 @@
-package dir
+package directory
 
 import (
 	"regexp"
@@ -39,6 +39,17 @@ func (d *Directory) Name() string {
 	d.RLock()
 	defer d.RUnlock()
 	return d.name
+}
+
+// Ancestry returns a slice of this Directory's ancestors plus self
+func (d *Directory) Ancestry() []dir.Directory {
+	var ancestry []dir.Directory
+	if !d.IsRoot() {
+		ancestry = append(d.parent.Ancestry(), d)
+	} else {
+		ancestry = []dir.Directory{d}
+	}
+	return ancestry
 }
 
 // Rename changes the Directory's name
@@ -123,7 +134,7 @@ func (d *Directory) AttachDirectory(dirIn dir.Directory) error {
 }
 
 // DetachDirectory removes a dir.Directory from this Directory
-// This is intended to be called from the target Direcotry's .Delete() method itself.
+// This is intended to be called from the target Directory's .Delete() method itself.
 // This does not test that the Directory is ready to be deleted, whatever that means (is empty, etc).
 func (d *Directory) DetachDirectory(dirIn dir.Directory) error {
 	d.Lock()
@@ -221,7 +232,7 @@ func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]dir.Fi
 }
 
 // CreateDirectory creates a sub-Directory of the provided Directory
-func CreateDirectory(d dir.Directory, name string) (dir.Directory, error) {
+func CreateDirectory(d dir.Directory, name string) *Directory {
 	subdir := &Directory{
 		uuid: uuid.NewV4(),
 		name: name,
@@ -231,10 +242,16 @@ func CreateDirectory(d dir.Directory, name string) (dir.Directory, error) {
 		subdir.parent = d
 		err := d.AttachDirectory(subdir)
 		if err != nil {
-			return nil, err
+			// TODO: decide how to handle err != nil; we would like CreateDirectory to be chainable, hence not returning err
+			return nil
 		}
 	} else {
 		subdir.root = subdir
 	}
-	return subdir, nil
+	return subdir
+}
+
+// CreateDirectory creates a sub-Directory on the receiver Directory
+func (d *Directory) CreateDirectory(name string) *Directory {
+	return CreateDirectory(d, name)
 }

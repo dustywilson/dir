@@ -12,6 +12,7 @@ import (
 type Directory interface {
 	UUID() uuid.UUID
 	Name() string
+	Ancestry() []Directory
 	Rename(string) error
 	Parent() Directory
 	IsRoot() bool
