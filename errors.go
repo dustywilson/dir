@@ -7,6 +7,7 @@ var (
 	ErrIsRoot           = errors.New("is root")
 	ErrNoMatch          = errors.New("no match")
 	ErrNotEmpty         = errors.New("not empty")
+	ErrIsEmpty          = errors.New("is empty")
 	ErrExists           = errors.New("already exists")
 	ErrIsCurrentVersion = errors.New("is set as current version")
 )

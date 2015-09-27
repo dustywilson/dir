@@ -17,6 +17,10 @@ type Version struct {
 	sync.RWMutex
 }
 
+func (v *Version) String() string {
+	return dir.VersionPath(v)
+}
+
 // UUID returns the version's UUID
 func (v *Version) UUID() uuid.UUID {
 	v.RLock()

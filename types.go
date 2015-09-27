@@ -9,6 +9,7 @@ import (
 
 // Directory is a directory
 type Directory interface {
+	String() string
 	UUID() uuid.UUID
 	Name() string
 	Rename(string) error
@@ -30,6 +31,7 @@ type Directory interface {
 
 // File is a file
 type File interface {
+	String() string
 	UUID() uuid.UUID
 	Name() string
 	Rename(string) error
@@ -47,6 +49,7 @@ type File interface {
 
 // Version is a version
 type Version interface {
+	String() string
 	UUID() uuid.UUID
 	File() File
 	SetFile(File) error
@@ -59,5 +62,8 @@ type Version interface {
 
 // User is a user
 type User interface {
+	String() string
 	UUID() uuid.UUID
+	Name() string
+	SetName(string) error
 }

@@ -19,6 +19,10 @@ type File struct {
 	sync.RWMutex
 }
 
+func (f *File) String() string {
+	return dir.FilePath(f)
+}
+
 // UUID returns the file's UUID
 func (f *File) UUID() uuid.UUID {
 	f.RLock()

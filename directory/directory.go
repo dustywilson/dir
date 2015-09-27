@@ -29,6 +29,10 @@ func NewDirectory() dir.Directory {
 	return d
 }
 
+func (d *Directory) String() string {
+	return dir.Path(d)
+}
+
 // UUID returns the Directory's UUID
 func (d *Directory) UUID() uuid.UUID {
 	return d.uuid
