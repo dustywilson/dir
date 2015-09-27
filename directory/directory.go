@@ -129,8 +129,15 @@ func (d *Directory) Delete() error {
 func (d *Directory) AttachDirectory(dirIn dir.Directory) error {
 	d.Lock()
 	defer d.Unlock()
-	dirIn.SetRoot(d.root)
-	// TODO: test for errors; ensure no duplicate attachment
+	for _, child := range d.children {
+		if child == dirIn {
+			return dir.ErrExists
+		}
+	}
+	err := dirIn.SetRoot(d.root)
+	if err != nil {
+		return err
+	}
 	d.children = append(d.children, dirIn)
 	return nil
 }
@@ -159,7 +166,15 @@ func (d *Directory) DetachDirectory(dirIn dir.Directory) error {
 func (d *Directory) AttachFile(f dir.File) error {
 	d.Lock()
 	defer d.Unlock()
-	// TODO: test for errors; ensure no duplicate attachment
+	for _, file := range d.files {
+		if file == f {
+			return dir.ErrExists
+		}
+	}
+	err := f.SetDirectory(d)
+	if err != nil {
+		return err
+	}
 	d.files = append(d.files, f)
 	return nil
 }
