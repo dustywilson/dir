@@ -211,9 +211,9 @@ func (d *Directory) FindDirectories(search *regexp.Regexp, recurseLevel int) ([]
 	if search.MatchString(d.name) {
 		directories = append(directories, d)
 	}
-	for _, dir := range d.children {
+	for _, child := range d.children {
 		if recurseLevel != 0 {
-			childMatches, err := dir.FindDirectories(search, recurseLevel-1)
+			childMatches, err := child.FindDirectories(search, recurseLevel-1)
 			if err != nil {
 				// TODO: decide what to do here, if anything.
 			} else {
@@ -237,9 +237,9 @@ func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]dir.Fi
 			files = append(files, file)
 		}
 	}
-	for _, dir := range d.children {
+	for _, child := range d.children {
 		if recurseLevel != 0 {
-			childMatches, err := dir.FindFiles(search, recurseLevel-1)
+			childMatches, err := child.FindFiles(search, recurseLevel-1)
 			if err != nil {
 				// TODO: decide what to do here, if anything.
 			} else {
