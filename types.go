@@ -1,7 +1,6 @@
 package dir
 
 import (
-	"errors"
 	"regexp"
 	"time"
 
@@ -12,9 +11,9 @@ import (
 type Directory interface {
 	UUID() uuid.UUID
 	Name() string
-	Ancestry() []Directory
 	Rename(string) error
 	Parent() Directory
+	Ancestry() []Directory
 	IsRoot() bool
 	Root() Directory
 	SetRoot(Directory) error
@@ -36,18 +35,19 @@ type File interface {
 	Rename(string) error
 	Directory() Directory
 	CurrentVersion() Version
+	SetCurrentVersion(Version) error
 	Owner() User
+	SetOwner(User) error
 	Delete() error
-	PlaceFile(Directory) error
-	PlaceVersion(Version) error
-	FindVersions(string) ([]Version, error)
+	AttachVersion(Version) error
+	FindVersions(time.Time, time.Time, User, int) ([]Version, error)
 }
 
 // Version is a version
 type Version interface {
 	UUID() uuid.UUID
 	File() File
-	Timestamp() time.Time
+	Time() time.Time
 	Creator() User
 	Delete() error
 	PlaceVersion(File) error
@@ -57,10 +57,3 @@ type Version interface {
 type User interface {
 	UUID() uuid.UUID
 }
-
-// Errors
-var (
-	ErrIsRoot   = errors.New("is root")
-	ErrNoMatch  = errors.New("no match")
-	ErrNotEmpty = errors.New("not empty")
-)

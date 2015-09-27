@@ -41,19 +41,6 @@ func (d *Directory) Name() string {
 	return d.name
 }
 
-// Ancestry returns a slice of this Directory's ancestors plus self
-func (d *Directory) Ancestry() []dir.Directory {
-	d.RLock()
-	defer d.RUnlock()
-	var ancestry []dir.Directory
-	if d.parent != nil {
-		ancestry = append(d.parent.Ancestry(), d)
-	} else {
-		ancestry = []dir.Directory{d}
-	}
-	return ancestry
-}
-
 // Rename changes the Directory's name
 func (d *Directory) Rename(name string) error {
 	d.Lock()
@@ -68,6 +55,19 @@ func (d *Directory) Parent() dir.Directory {
 	d.RLock()
 	defer d.RUnlock()
 	return d.parent
+}
+
+// Ancestry returns a slice of this Directory's ancestors plus self
+func (d *Directory) Ancestry() []dir.Directory {
+	d.RLock()
+	defer d.RUnlock()
+	var ancestry []dir.Directory
+	if d.parent != nil {
+		ancestry = append(d.parent.Ancestry(), d)
+	} else {
+		ancestry = []dir.Directory{d}
+	}
+	return ancestry
 }
 
 // IsRoot returns bool if this Directory is the root
