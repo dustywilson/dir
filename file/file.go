@@ -167,3 +167,20 @@ func (f *File) FindVersions(after time.Time, before time.Time, creator dir.User,
 	}
 	return matches, nil
 }
+
+// CreateFile creates a File in the provided Directory
+func CreateFile(d dir.Directory, name string) *File {
+	f := &File{
+		uuid: uuid.NewV4(),
+		name: name,
+	}
+	if d != nil {
+		f.directory = d
+		err := d.AttachFile(f)
+		if err != nil {
+			// TODO: decide how to handle err != nil; we would like CreateFile to be chainable, hence not returning err
+			return nil
+		}
+	}
+	return f
+}
