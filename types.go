@@ -34,6 +34,7 @@ type File interface {
 	Name() string
 	Rename(string) error
 	Directory() Directory
+	SetDirectory(Directory) error
 	CurrentVersion() Version
 	SetCurrentVersion(Version) error
 	Owner() User
@@ -47,10 +48,12 @@ type File interface {
 type Version interface {
 	UUID() uuid.UUID
 	File() File
+	SetFile(File) error
 	Time() time.Time
+	SetTime(time.Time) error
 	Creator() User
+	SetCreator(User) error
 	Delete() error
-	PlaceVersion(File) error
 }
 
 // User is a user
