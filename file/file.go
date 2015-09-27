@@ -95,11 +95,13 @@ func (f *File) Delete() error {
 	f.Lock()
 	defer f.Unlock()
 	if len(f.versions) > 0 {
+		// we can't delete files that have attached versions
 		return dir.ErrNotEmpty
 	}
 	if f.directory != nil {
 		f.directory.DetachFile(f)
 	}
+	// TODO: should we set some sort of "isDeleted" flag?
 	return nil
 }
 
@@ -119,6 +121,32 @@ func (f *File) attachVersionLocked(v dir.Version) error {
 		}
 	}
 	f.versions = append(f.versions, v)
+	return nil
+}
+
+// DetachVersion removes a dir.Version from this File
+// This is intended to be called from the target File's .Delete() method itself.
+// This does not test that the Version is ready to be deleted, whatever that means.
+func (f *File) DetachVersion(v dir.Version) error {
+	f.Lock()
+	defer f.Unlock()
+	if f.currentVersion == v {
+		if len(f.versions) > 1 {
+			// can't delete the current version.  set the currentVersion to something else first.
+			return dir.ErrIsCurrentVersion
+		}
+		f.currentVersion = nil // because we're about to delete the _only_ version, we'll nil this.
+	}
+	matched := false
+	for i, ver := range f.versions {
+		if ver == v {
+			f.versions = append(f.versions[:i], f.versions[i+1:]...)
+			matched = true
+		}
+	}
+	if !matched {
+		return dir.ErrNoMatch
+	}
 	return nil
 }
 
