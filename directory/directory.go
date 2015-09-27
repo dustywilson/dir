@@ -43,8 +43,10 @@ func (d *Directory) Name() string {
 
 // Ancestry returns a slice of this Directory's ancestors plus self
 func (d *Directory) Ancestry() []dir.Directory {
+	d.RLock()
+	defer d.RUnlock()
 	var ancestry []dir.Directory
-	if !d.IsRoot() {
+	if d.parent != nil {
 		ancestry = append(d.parent.Ancestry(), d)
 	} else {
 		ancestry = []dir.Directory{d}
