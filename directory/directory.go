@@ -250,7 +250,7 @@ func (d *Directory) FindFiles(search *regexp.Regexp, recurseLevel int) ([]dir.Fi
 	if len(files) == 0 {
 		return nil, dir.ErrNoMatch
 	}
-	return nil, nil
+	return files, nil
 }
 
 // CreateDirectory creates a sub-Directory of the provided Directory
