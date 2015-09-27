@@ -21,8 +21,8 @@ type Directory interface {
 	SetOwner(User) error
 	Delete() error
 	AttachDirectory(Directory) error
-	AttachFile(File) error
 	DetachDirectory(Directory) error
+	AttachFile(File) error
 	DetachFile(File) error
 	FindDirectories(*regexp.Regexp, int) ([]Directory, error)
 	FindFiles(*regexp.Regexp, int) ([]File, error)
@@ -41,6 +41,7 @@ type File interface {
 	SetOwner(User) error
 	Delete() error
 	AttachVersion(Version) error
+	DetachVersion(Version) error
 	FindVersions(time.Time, time.Time, User, int) ([]Version, error)
 }
 
