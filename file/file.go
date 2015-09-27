@@ -49,6 +49,15 @@ func (f *File) Directory() dir.Directory {
 	return f.directory
 }
 
+// SetDirectory sets the File's Directory
+func (f *File) SetDirectory(d dir.Directory) error {
+	f.Lock()
+	defer f.Unlock()
+	f.directory = d
+	// TODO: check for some sort of error?
+	return nil
+}
+
 // CurrentVersion returns the File's current Version (which might not be the newest one)
 func (f *File) CurrentVersion() dir.Version {
 	f.RLock()
