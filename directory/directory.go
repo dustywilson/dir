@@ -121,6 +121,7 @@ func (d *Directory) Delete() error {
 	} else {
 		return dir.ErrIsRoot
 	}
+	// TODO: should we set some sort of "isDeleted" flag?
 	return nil
 }
 
