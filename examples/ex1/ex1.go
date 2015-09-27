@@ -17,21 +17,36 @@ func main() {
 
 	file.CreateFile(cake, "Angel Food")
 
-	dirs, err := root.FindDirectories(regexp.MustCompile(`[Rr]`), -1)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("\nMatched %d directories.\n", len(dirs))
-	for _, d := range dirs {
-		fmt.Println(d)
+	{
+		dirs, err := root.FindDirectories(regexp.MustCompile(`[Rr]`), -1)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("\nMatched %d directories in 'root'.\n", len(dirs))
+		for _, d := range dirs {
+			fmt.Println(d)
+		}
 	}
 
-	files, err := root.FindFiles(regexp.MustCompile(`[Oo]`), -1)
-	if err != nil {
-		panic(err)
+	{
+		files, err := root.FindFiles(regexp.MustCompile(`[Oo]`), -1)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("\nMatched %d files in 'root'.\n", len(files))
+		for _, f := range files {
+			fmt.Println(f)
+		}
 	}
-	fmt.Printf("\nMatched %d files.\n", len(files))
-	for _, f := range files {
-		fmt.Println(f)
+
+	{
+		files, err := cake.FindFiles(regexp.MustCompile(`[Oo]`), -1)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("\nMatched %d files in 'cake'.\n", len(files))
+		for _, f := range files {
+			fmt.Println(f)
+		}
 	}
 }
